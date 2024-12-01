@@ -1,0 +1,8 @@
+{
+	"PlayerWidth": 3,
+	"playerHeight": 8, 
+	"EnemyWidth": 5, 
+	"EnemyHeight": 5,
+	"BulletWidth": 0.5, 
+	"BulletHeight": 3
+}

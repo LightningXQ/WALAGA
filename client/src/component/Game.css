@@ -1,0 +1,38 @@
+.game-container {
+	grid-row: 2 / 3;
+	grid-column: 2 / 3;
+
+  width: 100%;
+  height: 100%;
+
+  display: block;
+  position: relative;
+
+  background-color: black;
+  overflow: hidden;
+}
+
+.player {
+  position: absolute;
+  width: 3%;
+  height: 8%;
+  background-color: blue;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.enemy {
+  position: absolute;
+  width: 5%;
+  height: 5%;
+  background-color: red;
+  transform: translate(-50%, -50%);
+}
+
+.bullet {
+  position: absolute;
+  width: 0.5%;
+  height: 3%;
+  background-color: greenyellow;
+  transform: translate(-50%, -50%);
+}
