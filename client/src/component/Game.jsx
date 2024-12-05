@@ -3,11 +3,18 @@ import "./Game.css";
 import data from "../config/data.json";
 
 const Game = () => {
-  let hitDetected;
+  let bulletHitDetected;
   
   // const [playerPosition, setPlayerPosition] = useState(50);
-  const [enemyPosition, setEnemyPosition] = useState({ x: 50, y: 0 });
+  const [enemyPosition, setEnemyPosition] = useState([
+    { x: 10, y: 0 }, 
+    { x: 20, y: 0 },
+    { x: 30, y: 0 },
+    { x: 40, y: 0 },
+    { x: 50, y: 0 },
+  ]);
   const [bullets, setBullets] = useState([]);
+
   const [keyLeftPressed, setKeyLeftPressed] = useState(false);
   const [keyRightPressed, setKeyRightPressed] = useState(false);
   const [keySpacePressed, setKeySpacePressed] = useState(false);
@@ -101,10 +108,14 @@ const Game = () => {
 
   useEffect(() => {
     const enemyMoveInterval = setInterval(() => {
-      setEnemyPosition((prev) => ({
-        x: prev.x + calcEnemyMove(prev.x, playerPosition.current, 20, 2),
-        y: (prev.y + 1 > 100) ? 0 : prev.y + 1,
-      }));
+      setEnemyPosition((prev) => 
+        prev
+          .map((enemy) => ({
+            ...enemy,
+            x: enemy.x + calcEnemyMove(enemy.x, playerPosition.current, 20, 2),
+            y: (enemy.y + 1 > 100) ? 0 : enemy.y + 1
+          }))
+      );
 
     }, 20);
 
@@ -119,24 +130,40 @@ const Game = () => {
       setBullets((prevBullets) => {
 
         // 충돌 감지 및 처리
-        hitDetected = false;
+        bulletHitDetected = false;
         const updatedBullets = prevBullets.filter((bullet) => {
-          if (isColliding(bullet, enemyPosition)) {
-            hitDetected = true;
-            return false; // 충돌한 총알 제거
-          }
-          return true;
+          setEnemyPosition((prevEnemies) => {
+            const updatedEnemies = prevEnemies.filter((enemy) => {
+              if (isColliding(bullet, enemy) || bullet.y <= 0) {
+                bulletHitDetected = true;
+
+                return false;
+              }
+              return true;
+            });
+
+            return updatedEnemies;
+          });
+
+          return bulletHitDetected ? false : true;
         });
 
         // 적 위치 리셋
-        if (hitDetected) {
-          setEnemyPosition({
-            x: Math.random() * 100, // 새로운 적 위치 설정
-            y: 5,
-          });
-        }
+        // if (enemyHitDetected) {
+        //   setEnemyPosition({
+        //     x: Math.random() * 100, // 새로운 적 위치 설정
+        //     y: 5,
+        //   });
+        // }
 
         return updatedBullets;
+      });
+
+      setEnemyPosition((prevEnemies) => {
+        for (let i = 0; i < 5 - prevEnemies.length; i++) {
+          prevEnemies.push({ x: Math.random() * 100, y: 5 });
+        }
+        return prevEnemies;
       });
     }, 5);
 
@@ -152,13 +179,16 @@ const Game = () => {
           bottom: `10%`,
         }}
       ></div>
-      <div
-        className="enemy"
-        style={{
-          left: `${enemyPosition.x}%`,
-          top: `${enemyPosition.y}%`,
-        }}
-      ></div>
+      {enemyPosition.map((enemy, index) => (
+        <div
+          key={index}
+          className="enemy"
+          style={{
+            left: `${enemy.x}%`,
+            top: `${enemy.y}%`,
+          }}
+        ></div>
+      ))}
       {bullets.map((bullet, index) => (
         <div
           key={index}
